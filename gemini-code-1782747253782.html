@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Date Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght=500;600;700&family=Poppins:wght=400;500;600;700&family=Dancing+Script:wght=600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-deep:#b3175e;
+    --pink-mid:#d63384;
+    --pink-soft:#f7c6d9;
+    --bg-1:#fde2f3;
+    --bg-2:#e9d5ff;
+    --bg-3:#fde2e4;
+    --card-bg:#ffffff;
+    --text-main:#7a1f4a;
+    --text-soft:#9a5c7a;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    font-family:'Poppins',-apple-system,'Segoe UI',sans-serif;
+    overflow:hidden;
+    position:fixed;
+    inset:0;
+  }
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,var(--bg-1),var(--bg-2),var(--bg-3));
+    background-size:200% 200%;
+    animation:gradientShift 12s ease infinite;
+    -webkit-tap-highlight-color:transparent;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* floating petals */
+  .petal{
+    position:fixed;
+    top:-40px;
+    font-size:20px;
+    pointer-events:none;
+    opacity:0.8;
+    animation:fall linear infinite;
+    z-index:1;
+    user-select:none;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(360deg); }
+  }
+
+  .stage{
+    position:relative;
+    width:380px;
+    max-width:92vw;
+    max-height:92vh;
+    z-index:5;
+  }
+
+  .card{
+    background:linear-gradient(160deg,#ffffff,#fff8fb);
+    border-radius:clamp(18px,4vw,26px);
+    padding:clamp(26px,5vw,42px) clamp(20px,5vw,34px) clamp(24px,5vw,34px);
+    box-shadow:0 25px 60px rgba(179,23,94,0.28), 0 0 0 1px rgba(255,255,255,0.7) inset;
+    text-align:center;
+    position:relative;
+    animation:popIn 0.5s ease;
+    max-height:92vh;
+    overflow-y:auto;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .card::-webkit-scrollbar{ display:none; }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-1px; left:-1px; right:-1px; bottom:-1px;
+    border-radius:inherit;
+    background:linear-gradient(135deg,rgba(255,182,217,0.6),rgba(255,255,255,0));
+    z-index:-1;
+    filter:blur(8px);
+    opacity:0.7;
+  }
+  @keyframes popIn{
+    from{ opacity:0; transform:scale(0.85) translateY(10px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  h1.title{
+    font-family:'Dancing Script','Quicksand',cursive;
+    font-size:clamp(22px,6vw,30px);
+    color:var(--text-main);
+    margin:0 0 clamp(18px,4vw,26px);
+    line-height:1.4;
+    font-weight:700;
+  }
+  h1.title .flower{
+    font-size:0.8em;
+  }
+
+  .btn{
+    display:block;
+    width:100%;
+    padding:clamp(13px,3.4vw,16px) 0;
+    border:none;
+    border-radius:50px;
+    font-size:clamp(15px,3.8vw,18px);
+    font-weight:700;
+    font-family:'Quicksand',sans-serif;
+    cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    letter-spacing:0.3px;
+  }
+  .btn-yes{
+    background:linear-gradient(135deg,#ff7eb3,var(--pink-mid) 45%,var(--pink-deep));
+    color:#fff;
+    box-shadow:0 10px 24px rgba(179,23,94,0.4);
+    position:relative;
+    overflow:hidden;
+  }
+  .btn-yes::after{
+    content:"";
+    position:absolute;
+    top:0; left:-60%;
+    width:40%; height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,0.45),transparent);
+    transform:skewX(-20deg);
+    animation:shine 3.2s ease-in-out infinite;
+  }
+  @keyframes shine{
+    0%{ left:-60%; }
+    45%{ left:130%; }
+    100%{ left:130%; }
+  }
+  .btn-yes:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 30px rgba(179,23,94,0.5);
+  }
+  .btn-yes:active{ transform:translateY(0) scale(0.97); }
+
+  #noBtn{
+    background:#fff;
+    color:var(--text-soft);
+    border:1.5px solid #e8b6cf;
+    font-size:clamp(13px,3.2vw,14.5px);
+    font-weight:600;
+    font-family:'Quicksand',sans-serif;
+    padding:10px 24px;
+    width:auto;
+    border-radius:50px;
+    position:fixed;
+    z-index:9999;
+    display:block;
+    box-shadow:0 6px 16px rgba(179,23,94,0.15);
+    transition:left 0.15s ease, top 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  }
+  #noBtn:hover, #noBtn:focus{
+    background:#fff0f6;
+  }
+
+  .step1-wrap{
+    position:relative;
+    min-height:120px;
+  }
+
+  /* Calendar */
+  .cal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-size:clamp(13px,3.2vw,15px);
+    color:var(--text-main);
+    font-weight:600;
+  }
+  .cal-arrow{
+    cursor:pointer;
+    color:var(--pink-deep);
+    font-size:clamp(16px,4vw,18px);
+    padding:2px 10px;
+    user-select:none;
+    border-radius:50%;
+    transition:background 0.15s;
+  }
+  .cal-arrow:hover{ background:#fbe2ee; }
+  .pick-label{
+    font-size:clamp(12px,2.8vw,13px);
+    color:var(--text-soft);
+    text-align:left;
+    margin:14px 0 6px;
+    font-style:italic;
+  }
+  table.cal{
+    width:100%;
+    border-collapse:collapse;
+    font-family:'Quicksand',sans-serif;
+  }
+  table.cal th{
+    font-size:clamp(10px,2.4vw,11px);
+    color:var(--text-soft);
+    font-weight:600;
+    padding:4px 0;
+  }
+  table.cal td{
+    text-align:center;
+    padding:0;
+  }
+  .day-cell{
+    width:clamp(26px,7.5vw,32px);
+    height:clamp(26px,7.5vw,32px);
+    line-height:clamp(26px,7.5vw,32px);
+    margin:2px auto;
+    border-radius:50%;
+    font-size:clamp(11.5px,2.8vw,13px);
+    color:#555;
+    cursor:pointer;
+    transition:background 0.15s, color 0.15s;
+  }
+  .day-cell:hover{ background:#fbe2ee; }
+  .day-cell.selected{
+    background:var(--pink-deep);
+    color:#fff;
+    font-weight:700;
+  }
+  .day-cell.disabled{
+    color:#ddd;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  .time-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:clamp(6px,1.8vw,8px);
+    margin:8px 0 22px;
+    font-family:'Quicksand',sans-serif;
+  }
+  .time-pill{
+    padding:clamp(8px,2vw,9px) 4px;
+    border:1.3px solid #eccbdb;
+    border-radius:20px;
+    font-size:clamp(11px,2.6vw,12.5px);
+    color:#a45c80;
+    cursor:pointer;
+    background:#fff;
+    transition:all 0.15s;
+  }
+  .time-pill:hover{ background:#fdf0f6; }
+  .time-pill.selected{
+    background:var(--pink-deep);
+    color:#fff;
+    border-color:var(--pink-deep);
+  }
+
+  /* Food grid */
+  .food-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:clamp(9px,2.5vw,12px);
+    margin:18px 0 15px;
+  }
+  .food-card{
+    border:1.5px solid #f0d3e2;
+    border-radius:14px;
+    padding:clamp(14px,3.6vw,18px) 6px clamp(11px,3vw,14px);
+    cursor:pointer;
+    background:#fffafc;
+    transition:all 0.18s;
+    font-family:'Poppins',sans-serif;
+  }
+  .food-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 18px rgba(179,23,94,0.15);
+    border-color:#f3b8d4;
+  }
+  .food-card.selected{
+    border-color:var(--pink-deep);
+    background:linear-gradient(160deg,#fde6f0,#fdeef5);
+    box-shadow:0 8px 20px rgba(179,23,94,0.25);
+    transform:translateY(-2px);
+  }
+  .food-emoji{ font-size:clamp(24px,6.5vw,30px); display:block; margin-bottom:6px; }
+  .food-name{ font-size:clamp(12px,3vw,13.5px); color:var(--text-main); font-weight:600; font-family:'Quicksand',sans-serif; }
+
+  /* Custom Food Input */
+  .custom-food-wrap {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  .custom-food-input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1.5px solid #eccbdb;
+    border-radius: 50px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .custom-food-input:focus {
+    border-color: var(--pink-mid);
+  }
+  .custom-food-btn {
+    padding: 10px 18px;
+    background: var(--pink-mid);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .custom-food-btn:hover {
+    background: var(--pink-deep);
+  }
+
+  .btn-disabled{
+    opacity:0.45;
+    pointer-events:none;
+  }
+
+  /* Final card */
+  .final-title{
+    font-family:'Dancing Script',cursive;
+    font-size:clamp(30px,8vw,38px);
+    color:var(--pink-deep);
+    margin:0 0 20px;
+    font-weight:700;
+  }
+  .detail-box{
+    background:linear-gradient(160deg,#fdf2f7,#fce8f0);
+    border:1px solid #f6d4e4;
+    border-radius:16px;
+    padding:clamp(14px,3.6vw,18px) clamp(16px,4vw,20px);
+    text-align:left;
+    margin-bottom:20px;
+    font-family:'Poppins',sans-serif;
+  }
+  .detail-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:clamp(13.5px,3.4vw,15px);
+    color:#5c2c44;
+    padding:6px 0;
+    font-weight:500;
+  }
+  .detail-row + .detail-row{
+    border-top:1px solid rgba(179,23,94,0.08);
+  }
+  .detail-emoji{ font-size:clamp(15px,3.6vw,17px); width:22px; text-align:center; }
+  .final-msg{
+    font-family:'Dancing Script',cursive;
+    color:var(--pink-deep);
+    font-size:clamp(18px,4.6vw,21px);
+    font-weight:700;
+    margin:0 0 14px;
+  }
+  .screenshot-note {
+    background: #fff0f5;
+    border: 1px dashed var(--pink-mid);
+    color: var(--text-main);
+    padding: 10px;
+    border-radius: 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: clamp(13px, 3.2vw, 15px);
+    font-weight: 600;
+    margin-top: 15px;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .hidden{ display:none !important; }
+
+  .progress-dots{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-bottom:18px;
+  }
+  .dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#f0cfe0;
+    transition:background 0.2s, transform 0.2s;
+  }
+  .dot.active{
+    background:var(--pink-deep);
+    transform:scale(1.3);
+  }
+
+  .confetti{
+    position:fixed;
+    top:-20px;
+    pointer-events:none;
+    z-index:50;
+    animation:confettiFall linear forwards;
+  }
+  @keyframes confettiFall{
+    to{ transform:translateY(105vh) rotate(540deg); opacity:0.9; }
+  }
+
+  /* ===== Responsive breakpoints ===== */
+  @media (max-width:480px){
+    .stage{ width:94vw; }
+    .card{ border-radius:20px; }
+  }
+  @media (min-width:481px) and (max-width:900px){
+    .stage{ width:420px; }
+  }
+  @media (min-width:901px){
+    .stage{ width:440px; }
+    .card{ padding:46px 40px 38px; }
+  }
+  @media (max-height:560px){
+    .card{ padding-top:18px; padding-bottom:18px; }
+    .progress-dots{ margin-bottom:10px; }
+    h1.title{ margin-bottom:12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- STEP 1: Will you go on a date with me -->
+  <div class="card" id="step1">
+    <div class="progress-dots">
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <h1 class="title"><span class="flower">🌸</span> Will you go on a date with me? <span class="flower">🌸</span></h1>
+    <div class="step1-wrap">
+      <button class="btn btn-yes" id="yesBtn" onclick="goToStep(2)">YES ♥</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Pick a day & time -->
+  <div class="card hidden" id="step2">
+    <div class="progress-dots">
+      <div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <h1 class="title">So... when are you free? 📅🐾</h1>
+
+    <div class="pick-label">Pick a day</div>
+    <div class="cal-head">
+      <span class="cal-arrow" onclick="changeMonth(-1)">‹</span>
+      <span id="calMonthLabel">July 2026</span>
+      <span class="cal-arrow" onclick="changeMonth(1)">›</span>
+    </div>
+    <table class="cal">
+      <thead>
+        <tr><th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th></tr>
+      </thead>
+      <tbody id="calBody"></tbody>
+    </table>
+
+    <div class="pick-label">What time?</div>
+    <div class="time-grid" id="timeGrid"></div>
+
+    <button class="btn btn-yes btn-disabled" id="setDateBtn" onclick="goToStep(3)">Set the date 💕</button>
+  </div>
+
+  <!-- STEP 3: Food preference -->
+  <div class="card hidden" id="step3">
+    <div class="progress-dots">
+      <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div>
+    </div>
+    <h1 class="title">What are we feeling? 🍽️✨</h1>
+    <div class="food-grid" id="foodGrid">
+      <div class="food-card" data-food="Chaap"><span class="food-emoji">🍖</span><span class="food-name">Chaap</span></div>
+      <div class="food-card" data-food="Momo"><span class="food-emoji">🥟</span><span class="food-name">Momo</span></div>
+      <div class="food-card" data-food="Shawrma"><span class="food-emoji">🌯</span><span class="food-name">Shawrma</span></div>
+      <div class="food-card" data-food="Coffee"><span class="food-emoji">☕</span><span class="food-name">Coffee</span></div>
+      <div class="food-card" data-food="Biriyani"><span class="food-emoji">🍛</span><span class="food-name">Biriyani</span></div>
+      <div class="food-card" data-food="Pizza"><span class="food-emoji">🍕</span><span class="food-name">Pizza</span></div>
+      <div class="food-card" data-food="Burger"><span class="food-emoji">🍔</span><span class="food-name">Burger</span></div>
+    </div>
+
+    <!-- Custom Food Input System -->
+    <div class="custom-food-wrap">
+      <input type="text" id="customFoodInput" class="custom-food-input" placeholder="Craving something else?">
+      <button type="button" class="custom-food-btn" onclick="addCustomFood()">Add</button>
+    </div>
+
+    <button class="btn btn-yes btn-disabled" id="nextFoodBtn" onclick="goToStep(4)">Next 💕</button>
+  </div>
+
+  <!-- STEP 4: Final confirmation -->
+  <div class="card hidden" id="step4">
+    <div class="progress-dots">
+      <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div>
+    </div>
+    <h1 class="final-title">YAY!! 💕</h1>
+    <div class="detail-box">
+      <div class="detail-row"><span class="detail-emoji">📅</span><span id="finalDate">--</span></div>
+      <div class="detail-row"><span class="detail-emoji">⏰</span><span id="finalTime">--</span></div>
+      <div class="detail-row"><span class="detail-emoji">🍽️</span><span id="finalFood">--</span></div>
+    </div>
+    <p class="final-msg">I can't wait to see you! 🌷✨</p>
+    <div class="screenshot-note">📸 Send Screenshot to Your Partner</div>
+  </div>
+
+</div>
+
+<!-- The runaway No button (always present, fixed position, lives over step 1) -->
+<button id="noBtn" class="btn">No</button>
+
+<script>
+/* ===================== Background floating petals ===================== */
+(function spawnPetals(){
+  const petals = ['🌸','💗','✨','🌷'];
+  const count = 14;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className='petal';
+    p.textContent = petals[Math.floor(Math.random()*petals.length)];
+    p.style.left = Math.random()*100+'vw';
+    p.style.fontSize = (14+Math.random()*14)+'px';
+    p.style.animationDuration = (8+Math.random()*10)+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    document.body.appendChild(p);
+  }
+})();
+
+/* ===================== Step navigation ===================== */
+const steps = [null, document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4')];
+let currentStep = 1;
+
+function goToStep(n){
+  steps[currentStep].classList.add('hidden');
+  steps[n].classList.remove('hidden');
+  currentStep = n;
+  if(n>=2){ document.getElementById('noBtn').style.display='none'; }
+}
+
+/* ===================== Runaway No button (always dodges — YES is the only way forward) ===================== */
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
+let dodgeCount = 0;
+
+const playfulTexts = ['No','Please? 🥺','Nope! 😜','Yes? 😉','Catch me first 😄','Pretty please 🌸','Try again~','Say yes! 💕','Almost! 🌸','Nuh-uh 🙈','Just say YES 😆','Not happening 💕','Keep trying!','Still no 😆','C\'mon, YES! 🥰'];
+
+function placeNoNextToYes(){
+  requestAnimationFrame(()=>{
+    const rect = yesBtn.getBoundingClientRect();
+    const btnW = noBtn.offsetWidth || 90;
+    let left = rect.left + rect.width/2 - btnW/2;
+    let top = rect.bottom + 16;
+    left = Math.max(10, Math.min(left, window.innerWidth - btnW - 10));
+    top = Math.min(top, window.innerHeight - 60);
+    noBtn.style.left = left + 'px';
+    noBtn.style.top = top + 'px';
+    noBtn.style.display = 'block';
+  });
+}
+
+function dodge(){
+  if(currentStep!==1) return;
+  dodgeCount++;
+  const btnW = noBtn.offsetWidth || 90;
+  const btnH = noBtn.offsetHeight || 40;
+  const maxLeft = Math.max(16, window.innerWidth - btnW - 16);
+  const maxTop = Math.max(16, window.innerHeight - btnH - 16);
+  const newLeft = 16 + Math.random()*(maxLeft-16);
+  const newTop = 16 + Math.random()*(maxTop-16);
+  noBtn.style.left = newLeft+'px';
+  noBtn.style.top = newTop+'px';
+  noBtn.textContent = playfulTexts[Math.floor(Math.random()*playfulTexts.length)];
+
+  noBtn.style.transform = 'scale(0.92) rotate(-4deg)';
+  setTimeout(()=>{ noBtn.style.transform = ''; }, 160);
+}
+
+noBtn.addEventListener('mouseover', dodge);
+noBtn.addEventListener('mousedown', (e)=>{ e.preventDefault(); dodge(); });
+noBtn.addEventListener('click', (e)=>{ e.preventDefault(); dodge(); });
+noBtn.addEventListener('touchstart', (e)=>{
+  if(currentStep!==1) return;
+  e.preventDefault();
+  dodge();
+}, {passive:false});
+
+window.addEventListener('resize', ()=>{ if(currentStep===1) placeNoNextToYes(); });
+window.addEventListener('load', placeNoNextToYes);
+placeNoNextToYes();
+setTimeout(placeNoNextToYes, 150);
+setTimeout(placeNoNextToYes, 500);
+
+/* ===================== Calendar ===================== */
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+let calDate = new Date(2026, 6, 1); 
+let selectedDay = null;
+let selectedTime = null;
+
+function renderCalendar(){
+  document.getElementById('calMonthLabel').textContent = monthNames[calDate.getMonth()]+' '+calDate.getFullYear();
+  const body = document.getElementById('calBody');
+  body.innerHTML='';
+
+  const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
+  const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
+
+  let row = document.createElement('tr');
+  for(let i=0;i<firstDay;i++){
+    const td = document.createElement('td');
+    row.appendChild(td);
+  }
+  let dayCount = firstDay;
+  for(let d=1; d<=daysInMonth; d++){
+    const td = document.createElement('td');
+    const cell = document.createElement('div');
+    cell.className='day-cell';
+    cell.textContent = d;
+    cell.onclick = ()=>selectDay(d, cell);
+    if(selectedDay===d) cell.classList.add('selected');
+    td.appendChild(cell);
+    row.appendChild(td);
+    dayCount++;
+    if(dayCount%7===0){
+      body.appendChild(row);
+      row = document.createElement('tr');
+    }
+  }
+  if(row.children.length>0) body.appendChild(row);
+}
+
+function selectDay(d, cellEl){
+  selectedDay = d;
+  document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('selected'));
+  cellEl.classList.add('selected');
+  checkStep2Ready();
+}
+
+function changeMonth(delta){
+  calDate.setMonth(calDate.getMonth()+delta);
+  selectedDay = null;
+  renderCalendar();
+  checkStep2Ready();
+}
+
+/* Time slots */
+const timeSlots = ['12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM'];
+function renderTimeGrid(){
+  const grid = document.getElementById('timeGrid');
+  grid.innerHTML='';
+  timeSlots.forEach(t=>{
+    const pill = document.createElement('div');
+    pill.className='time-pill';
+    pill.textContent=t;
+    pill.onclick = ()=>{
+      document.querySelectorAll('.time-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      selectedTime = t;
+      checkStep2Ready();
+    };
+    grid.appendChild(pill);
+  });
+}
+
+function checkStep2Ready(){
+  const btn = document.getElementById('setDateBtn');
+  if(selectedDay && selectedTime){
+    btn.classList.remove('btn-disabled');
+  } else {
+    btn.classList.add('btn-disabled');
+  }
+}
+
+renderCalendar();
+renderTimeGrid();
+
+/* ===================== Food selection ===================== */
+let selectedFood = null;
+
+function setupFoodSelection() {
+  document.querySelectorAll('.food-card').forEach(card=>{
+    card.onclick = () => {
+      document.querySelectorAll('.food-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedFood = card.dataset.food;
+      document.getElementById('nextFoodBtn').classList.remove('btn-disabled');
+    };
+  });
+}
+setupFoodSelection();
+
+/* Add Custom Food Function & Auto Navigate */
+function addCustomFood() {
+  const input = document.getElementById('customFoodInput');
+  const foodName = input.value.trim();
+  
+  if (foodName === "") return;
+  
+  const foodGrid = document.getElementById('foodGrid');
+  
+  const newCard = document.createElement('div');
+  newCard.className = 'food-card selected';
+  newCard.setAttribute('data-food', foodName);
+  newCard.innerHTML = `<span class="food-emoji">✨</span><span class="food-name">${foodName}</span>`;
+  
+  document.querySelectorAll('.food-card').forEach(c=>c.classList.remove('selected'));
+  foodGrid.appendChild(newCard);
+  
+  selectedFood = foodName;
+  document.getElementById('nextFoodBtn').classList.remove('btn-disabled');
+  
+  input.value = "";
+  setupFoodSelection(); // re-bind events
+  
+  // Auto next page on custom food add
+  setTimeout(() => {
+    goToStep(4);
+  }, 300);
+}
+
+/* ===================== Final card population ===================== */
+function populateFinal(){
+  const dateStr = monthNames[calDate.getMonth()].slice(0,3)+' '+selectedDay+', '+calDate.getFullYear();
+  const fullDate = new Date(calDate.getFullYear(), calDate.getMonth(), selectedDay);
+  const weekday = fullDate.toLocaleDateString('en-US', { weekday: 'long' });
+  const month = monthNames[calDate.getMonth()];
+  document.getElementById('finalDate').textContent = weekday+', '+month+' '+selectedDay;
+  document.getElementById('finalTime').textContent = selectedTime;
+  document.getElementById('finalFood').textContent = selectedFood;
+  burstConfetti();
+  sendDetailsSilently();
+}
+
+/* ===================== Silent auto-send (Web3Forms) ===================== */
+const WEB3FORMS_ACCESS_KEY = "PUT_YOUR_ACCESS_KEY_HERE";
+let alreadySent = false;
+
+function sendDetailsSilently(){
+  if(alreadySent) return;
+  if(!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "PUT_YOUR_ACCESS_KEY_HERE") return; 
+  alreadySent = true;
+
+  const fullDate = new Date(calDate.getFullYear(), calDate.getMonth(), selectedDay);
+  const weekday = fullDate.toLocaleDateString('en-US', { weekday: 'long' });
+  const month = monthNames[calDate.getMonth()];
+  const dateText = weekday+', '+month+' '+selectedDay+', '+calDate.getFullYear();
+
+  const payload = {
+    access_key: WEB3FORMS_ACCESS_KEY,
+    subject: "She said YES! 💕 Date details",
+    from_name: "Date Request Site",
+    Date: dateText,
+    Time: selectedTime,
+    Food: selectedFood
+  };
+
+  fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(()=>{ });
+}
+
+function burstConfetti(){
+  const emojis = ['🎉','💗','✨','🌸','💕'];
+  for(let i=0;i<26;i++){
+    const c = document.createElement('div');
+    c.className='confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100+'vw';
+    c.style.fontSize = (14+Math.random()*16)+'px';
+    c.style.animationDuration = (1.8+Math.random()*1.4)+'s';
+    c.style.animationDelay = (Math.random()*0.4)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4000);
+  }
+}
+
+const originalGoToStep = goToStep;
+goToStep = function(n){
+  if(n===4) populateFinal();
+  originalGoToStep(n);
+};
+</script>
+</body>
+</html>
